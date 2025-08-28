@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Métodos Numéricos</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet" crossorigin="anonymous">
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+<div class="container">
+    <nav th:replace="/layout/template :: menu"></nav>
+    <div th:replace="/layout/template :: bannerunit2"></div>
+
+    <nav aria-label="breadcrumb" class="mt-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/unit3">Sistemas Lineales</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Solución - Gauss-Jordan</li>
+        </ol>
+    </nav>
+
+    <div class="container">
+        <h1 class="text">Método Directo: Gauss-Jordan</h1>
+
+        <!-- Parámetros y resultados generales -->
+        <div class="row justify-content-start mt-3">
+            <div class="col-4"><p class="text">Tamaño del Sistema (n)</p></div>
+            <div class="col-4"><p th:text="${solveGaussJordan.n}">n</p></div>
+        </div>
+        <div class="row justify-content-start">
+            <div class="col-4"><p class="text">Tolerancia (To)</p></div>
+            <div class="col-4"><p th:text="${solveGaussJordan.to}">1e-12</p></div>
+        </div>
+        <div class="row justify-content-start">
+            <div class="col-4"><p class="text">Pivoteo Parcial</p></div>
+            <div class="col-4">
+                <p th:text="${solveGaussJordan.pivoteoParcial} ? 'Sí' : 'No'">No</p>
+            </div>
+        </div>
+        <div class="row justify-content-start">
+            <div class="col-4"><p class="text">Determinante (De)</p></div>
+            <div class="col-4"><p th:text="${solveGaussJordan.de}">0.0</p></div>
+        </div>
+        <div class="row justify-content-start" th:if="${solveGaussJordan.er != null}">
+            <div class="col-4"><p class="text">Error (ER)</p></div>
+            <div class="col-4"><p th:text="${solveGaussJordan.er}">0.0</p></div>
+        </div>
+
+        <!-- Matriz aumentada Ab -->
+        <div class="mt-4" th:if="${solveGaussJordan.ab != null}">
+            <h4>Matriz Aumentada [A|B] (Ab)</h4>
+            <div class="container">
+                <div class="row" th:each="i : ${#numbers.sequence(0, solveGaussJordan.n - 1)}">
+                    <div class="col" th:each="j : ${#numbers.sequence(0, solveGaussJordan.n)}">
+                        <span th:text="${solveGaussJordan.ab[i][j]}">0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matriz reducida RREF -->
+        <div class="mt-4" th:if="${solveGaussJordan.r != null}">
+            <h4>Matriz Reducida (RREF)</h4>
+            <div class="container">
+                <div class="row" th:each="i : ${#numbers.sequence(0, solveGaussJordan.n - 1)}">
+                    <div class="col" th:each="j : ${#numbers.sequence(0, solveGaussJordan.n)}">
+                        <span th:text="${solveGaussJordan.r[i][j]}">0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pasos/Bitácora -->
+        <div class="mt-4" th:if="${solveGaussJordan.pasos != null}">
+            <h4>Pasos</h4>
+            <div class="accordion" id="acordeonGJ">
+                <div class="accordion-item" th:each="p,idx : ${solveGaussJordan.pasos}">
+                    <h2 class="accordion-header" th:attr="id=${'h-' + idx.index}">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                th:attr="data-bs-target=${'#c-' + idx.index}"
+                                aria-expanded="false"
+                                th:attr="aria-controls=${'c-' + idx.index}">
+                            <span th:text="${'Paso ' + (idx.index + 1)}">Paso</span>
+                        </button>
+                    </h2>
+                    <div class="accordion-collapse collapse"
+                         th:attr="id=${'c-' + idx.index}"
+                         th:attrappend="aria-labelledby=${'h-' + idx.index}"
+                         data-bs-parent="#acordeonGJ">
+                        <div class="accordion-body">
+                            <span th:text="${p}">Descripción del paso</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solución -->
+        <div class="row align-items-start mt-4">
+            <div class="col-3">
+                <p class="fw-semibold">Solución (X)</p>
+                <div class="container" th:if="${solveGaussJordan.x != null}">
+                    <div class="row" th:each="i : ${#numbers.sequence(0, solveGaussJordan.n - 1)}">
+                        <div class="col">
+                            <span th:text="${solveGaussJordan.x[i]}">0.0</span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${solveGaussJordan.x == null}">
+                    <span>No hay solución única (De = 0 o pivote ~ 0).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="my-4">
+            <a class="btn btn-secondary" href="/unit3/formgaussjordan">Resolver otro sistema</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

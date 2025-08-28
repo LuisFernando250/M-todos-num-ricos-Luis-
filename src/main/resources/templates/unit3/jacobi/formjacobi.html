@@ -1,0 +1,141 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MÉTODOS NUMÉRICOS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<script th:inline="javascript">
+    function crearMatriz() {
+        var n = parseInt(document.getElementById('MN').value || '0', 10);
+        var contA = document.getElementById('ContenedorMatriz');
+        var contB = document.getElementById('ContenedorB');
+        var contX0 = document.getElementById('ContenedorX0');
+        contA.replaceChildren();
+        contB.replaceChildren();
+        contX0.replaceChildren();
+
+        if (!n || n < 2 || n > 4) {
+            alert('Ingresa un n válido (2, 3 o 4).');
+            return;
+        }
+
+        for (let i = 1; i <= n; i++) {
+            let rowA = document.createElement('div');
+            rowA.className = "row";
+            contA.appendChild(rowA);
+            for (let j = 1; j <= n; j++) {
+                let colA = document.createElement('div');
+                colA.className = "col";
+                rowA.appendChild(colA);
+                let inputA = document.createElement('input');
+                inputA.type = 'text';
+                inputA.name = 'matrizA[]';    // plano n*n (se mapeará en el controlador)
+                inputA.placeholder = 'a' + i + j;
+                inputA.className = "form-control mb-3";
+                colA.appendChild(inputA);
+            }
+
+            let rowB = document.createElement('div');
+            rowB.className = "row";
+            contB.appendChild(rowB);
+            let colB = document.createElement('div');
+            colB.className = 'col';
+            rowB.appendChild(colB);
+            let inputB = document.createElement('input');
+            inputB.type = 'text';
+            inputB.name = 'vectorB[]';       // plano n (se mapeará en el controlador)
+            inputB.placeholder = 'b' + i;
+            inputB.className = 'form-control mb-3';
+            colB.appendChild(inputB);
+
+            let rowX0 = document.createElement('div');
+            rowX0.className = "row";
+            contX0.appendChild(rowX0);
+            let colX0 = document.createElement('div');
+            colX0.className = 'col';
+            rowX0.appendChild(colX0);
+            let inputX0 = document.createElement('input');
+            inputX0.type = 'text';
+            inputX0.name = 'vectorX0[]';     // plano n (se mapeará en el controlador)
+            inputX0.placeholder = 'x0_' + i;
+            inputX0.className = 'form-control mb-3';
+            colX0.appendChild(inputX0);
+        }
+
+        document.getElementById('resolver').style.display = 'block';
+    }
+</script>
+
+<body>
+<nav th:replace="/layout/template :: menu"></nav>
+<div th:replace="/layout/template :: bannerunit2"></div>
+
+<div class="container">
+    <nav aria-label="breadcrumb" class="mt-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/unit3">Sistemas Lineales</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Formulario - Jacobi</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="container">
+    <!-- IMPORTANTE: acción y objeto según tu controlador -->
+    <form class="row g-3" th:action="@{/unit3/solvejacobi}" method="post" th:object="${jacobi}">
+        <div class="container">
+            <h1 class="text">Método iterativo: Jacobi</h1>
+            <h3 class="text">Ingresa los parámetros siguientes:</h3>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="MN" class="form-label"># Dimensión del sistema (n = 2,3,4)</label>
+                    <input type="text" class="form-control" id="MN" name="n" placeholder="3">
+                </div>
+                <div class="col-md-3">
+                    <label for="TO" class="form-label">Tolerancia (To)</label>
+                    <input type="text" class="form-control" id="TO" name="to" placeholder="1e-6">
+                </div>
+                <div class="col-md-3">
+                    <label for="IM" class="form-label">Iteraciones Máximas</label>
+                    <input type="text" class="form-control" id="IM" name="iteracionesMaximas" placeholder="100">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary" onclick="crearMatriz()">Crear Matriz</button>
+                </div>
+            </div>
+
+            <div class='row mt-3'>
+                <div class='Contenedor text-center'>
+                    <div class="row align-items-start">
+                        <div class='col'>
+                            <p class="fw-semibold">MATRIZ A</p>
+                            <div id='ContenedorMatriz'></div>
+                        </div>
+                        <div class='col-2'>
+                            <p class="fw-semibold">Vector B</p>
+                            <div id='ContenedorB'></div>
+                        </div>
+                        <div class='col-2'>
+                            <p class="fw-semibold">Vector X0 (inicial)</p>
+                            <div id='ContenedorX0'></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id='resolver' class="p-2 row" style="display:none">
+                    <div class="col-12">
+                        <br>
+                        <button type="submit" class="btn btn-primary">Resolver con Jacobi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

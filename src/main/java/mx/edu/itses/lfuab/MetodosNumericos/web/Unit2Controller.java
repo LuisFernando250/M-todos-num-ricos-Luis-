@@ -2,6 +2,7 @@ package mx.edu.itses.lfuab.MetodosNumericos.web;
 
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.Biseccion;
+import mx.edu.itses.lfuab.MetodosNumericos.domain.EliminacionGaussiana;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.NewtonRaphson;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.PuntoFijo;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.ReglaFalsa;
@@ -20,53 +21,36 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class Unit2Controller {
    @Autowired
     private UnidadIIService unidadIIservice;
-    
-    
-    
+
     @GetMapping("/unit2")
     public String index(Model model){
         return "unit2/index";
     }
-    
-    
+
     @GetMapping("/unit2/formbisection")
     public String formBisection(Model model) {
-
         Biseccion bisection = new Biseccion();
-
         model.addAttribute("bisection", bisection);
-
         return "unit2/bisection/formbisection";
     }
 
     @PostMapping("/unit2/solvebisection")
     public String solvebisection(Biseccion bisection, Model model) {
-
-        /* double valorFX = Funciones.Ecuacion(bisection.getFX(), bisection.getXL());
-         log.info("Valor de FX: " + valorFX);
-         */
         var solveBisection = unidadIIservice.AlgoritmoBiseccion(bisection);
-
         model.addAttribute("solveBisection", solveBisection);
         return "/unit2/bisection/solvebisection";
-        // return "index";
     }
 
     @GetMapping("/unit2/formregulafalsi")
     public String formRegulaFalsi(Model model) {
-
         ReglaFalsa regulafalsi = new ReglaFalsa();
-
         model.addAttribute("regulafalsi", regulafalsi);
-
         return "unit2/reglafalsa/formregulafalsi";
     }
 
     @PostMapping("/unit2/solveregulafalsi")
     public String solvregulafalsi(ReglaFalsa regulafalsi, Model model) {
-
         var solveRegulaFalsi = unidadIIservice.AlgoritmoReglaFalsa(regulafalsi);
-
         model.addAttribute("solveRegulaFalsi", solveRegulaFalsi);
         return "/unit2/reglafalsa/solveregulafalsi";
     }
@@ -74,16 +58,13 @@ public class Unit2Controller {
     @GetMapping("/unit2/formfixedpoint")
     public String formFixedPoint(Model model) {
         PuntoFijo fixedpoint = new PuntoFijo();
-
         model.addAttribute("fixedpoint", fixedpoint);
-
         return "unit2/puntofijo/formfixedpoint";
     }
 
     @PostMapping("/unit2/solvefixedpoint")
     public String solvefixedpoint(PuntoFijo fixedpoint, Model model) {
         var solveFixedPoint = unidadIIservice.AlgoritmoPuntoFijo(fixedpoint);
-
         model.addAttribute("solveFixedPoint", solveFixedPoint);
         return "/unit2/puntofijo/solvefixedpoint";
     }
@@ -91,9 +72,7 @@ public class Unit2Controller {
     @GetMapping("/unit2/formnewtonraphson")
     public String formNewtonRaphson(Model model) {
         NewtonRaphson newtonraphson = new NewtonRaphson();
-
         model.addAttribute("newtonraphson", newtonraphson);
-
         return "unit2/newtonraphson/formnewtonraphson";
     }
 
@@ -103,28 +82,28 @@ public class Unit2Controller {
         model.addAttribute("solveNewtonRaphson", solveNewtonRaphson);
         return "/unit2/newtonraphson/solvenewtonraphson";
     }
-    
+
     @GetMapping("/unit2/formsecant")
     public String formSecant(Model model){
         Secante secant = new Secante();
         model.addAttribute("secant", secant);
         return "unit2/secante/formsecant";
     }
-    
+
     @PostMapping("/unit2/solvesecant")
     public String solvesecant(Secante secant, Model model){
         var solveSecant = unidadIIservice.AlgoritmoSecante(secant);
         model.addAttribute("solveSecant", solveSecant);
         return "/unit2/secante/solvesecant";
     }
-    
+
     @GetMapping("/unit2/formmodsecant")
     public String formModSecant(Model model){
         SecanteModificado modsecant = new SecanteModificado();
         model.addAttribute("modsecant", modsecant);
         return "unit2/secantemodificado/formmodsecant";
     }
-    
+
     @PostMapping("/unit2/solvemodsecant")
     public String solvemodsecant(SecanteModificado modsecant, Model model){
         var solveModSecant = unidadIIservice.AlgoritmoSecanteModificado(modsecant);
@@ -132,4 +111,18 @@ public class Unit2Controller {
         return "/unit2/secantemodificado/solvemodsecant";
     }
 
+
+    @GetMapping("/unit2/formEliminacionGaussiana")
+    public String formEliminacionGaussiana(Model model) {
+        EliminacionGaussiana gauss = new EliminacionGaussiana();
+        model.addAttribute("gauss", gauss);
+       return "unit2/eliminaciongaussiana/formEliminacionGaussiana";
+    }
+
+    @PostMapping("/unit2/solveEliminacionGaussiana")
+    public String solveEliminacionGaussiana(EliminacionGaussiana gauss, Model model) {
+        var solveGauss = unidadIIservice.AlgoritmoEliminacionGaussiana(gauss);
+        model.addAttribute("solveGauss", solveGauss);
+      return "unit2/eliminaciongaussiana/solveEliminacionGaussiana";
+    }
 }

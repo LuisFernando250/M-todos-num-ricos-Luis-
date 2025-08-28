@@ -7,6 +7,7 @@ import mx.edu.itses.lfuab.MetodosNumericos.domain.PuntoFijo;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.ReglaFalsa;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.Secante;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.SecanteModificado;
+import mx.edu.itses.lfuab.MetodosNumericos.domain.EliminacionGaussiana;
 
 public interface UnidadIIService {
    
@@ -16,5 +17,6 @@ public interface UnidadIIService {
       public ArrayList<NewtonRaphson> AlgoritmoNewtonRaphon (NewtonRaphson newtonraphson);
       public ArrayList<Secante> AlgoritmoSecante (Secante secant);
       public ArrayList<SecanteModificado> AlgoritmoSecanteModificado  (SecanteModificado modsecant);
+      public ArrayList<EliminacionGaussiana> AlgoritmoEliminacionGaussiana(EliminacionGaussiana eliminaciongaussiana);
       
 }

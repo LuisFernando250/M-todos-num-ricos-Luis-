@@ -1,0 +1,122 @@
+package mx.edu.itses.lfuab.MetodosNumericos.web;
+
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import mx.edu.itses.lfuab.MetodosNumericos.domain.DDNewton;
+import mx.edu.itses.lfuab.MetodosNumericos.domain.Lagrange;
+import mx.edu.itses.lfuab.MetodosNumericos.services.UnidadIVService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+@Slf4j
+public class Unit4Controller {
+
+    @Autowired
+    private UnidadIVService unidadIVService;
+
+    @GetMapping("/unit4")
+    public String index(Model model) {
+        return "unit4/index";
+    }
+
+    // ------------------ DD NEWTON ------------------
+    @GetMapping("/unit4/formddnewton")
+    public String formDDNewton(Model model) {
+        DDNewton ddnewton = new DDNewton();
+        model.addAttribute("ddnewton", ddnewton);
+        return "unit4/ddnewton/formddnewton";
+    }
+
+    @PostMapping("/unit4/solveddnewton")
+    public String solveDDNewton(
+            DDNewton ddnewton,
+            Errors error,
+            Model model,
+            @RequestParam("n") int n,
+            @RequestParam("x[]") List<Double> xList,
+            @RequestParam("y[]") List<Double> yList,
+            @RequestParam(value = "evalX[]", required = false) List<Double> evalXList,
+            @RequestParam(value = "px", required = false) Double px
+    ) {
+        // Validaciones mínimas
+        if (n <= 0 || xList == null || yList == null || xList.size() < n || yList.size() < n) {
+            model.addAttribute("mensajeError", "Parámetros inválidos: revisa n, x[] y y[].");
+            return "unit4/ddnewton/formddnewton";
+        }
+
+        double[] x = new double[n];
+        double[] y = new double[n];
+        for (int i = 0; i < n; i++) {
+            x[i] = xList.get(i);
+            y[i] = yList.get(i);
+        }
+
+        ddnewton.setN(n);
+        ddnewton.setX(x);
+        ddnewton.setY(y);
+
+        // Acepta EITHER evalX[] OR px (uno o ambos)
+        if (evalXList != null && !evalXList.isEmpty()) {
+            double[] evalX = new double[evalXList.size()];
+            for (int i = 0; i < evalX.length; i++) evalX[i] = evalXList.get(i);
+            ddnewton.setEvalX(evalX);
+        } else if (px != null) {
+            ddnewton.setEvalX(new double[]{px});
+        }
+
+        var solveDDNewton = unidadIVService.AlgoritmoDDNewton(ddnewton);
+        model.addAttribute("solveDDNewton", solveDDNewton);
+        return "unit4/ddnewton/solveddnewton";
+    }
+
+    // ------------------ LAGRANGE ------------------
+    @GetMapping("/unit4/formlagrange")
+    public String formLagrange(Model model) {
+        Lagrange lagrange = new Lagrange();
+        model.addAttribute("lagrange", lagrange);
+        return "unit4/lagrange/formlagrange";
+    }
+
+    @PostMapping("/unit4/solvelagrange")
+    public String solveLagrange(
+            Lagrange lagrange,
+            Errors error,
+            Model model,
+            @RequestParam("n") int n,
+            @RequestParam("x[]") List<Double> xList,
+            @RequestParam("y[]") List<Double> yList,
+            @RequestParam(value = "px", required = false) Double px
+    ) {
+        // Validaciones mínimas
+        if (n <= 0 || xList == null || yList == null || xList.size() < n || yList.size() < n) {
+            model.addAttribute("mensajeError", "Parámetros inválidos: revisa n, x[] y y[].");
+            return "unit4/lagrange/formlagrange";
+        }
+
+        double[] x = new double[n];
+        double[] y = new double[n];
+        for (int i = 0; i < n; i++) {
+            x[i] = xList.get(i);
+            y[i] = yList.get(i);
+        }
+
+        lagrange.setN(n);
+        lagrange.setX(x);
+        lagrange.setY(y);
+
+        if (px != null) {
+            lagrange.setEvalX(new double[]{px});
+        }
+
+        var solveLagrange = unidadIVService.AlgoritmoLagrange(lagrange);
+        model.addAttribute("solveLagrange", solveLagrange);
+        // IMPORTANTE: usa el nombre del template tal cual está en /templates/unit4/lagrange/solvelagrange.html
+        return "unit4/lagrange/solvelagrange";
+    }
+}

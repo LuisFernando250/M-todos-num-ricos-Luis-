@@ -3,6 +3,7 @@ package mx.edu.itses.lfuab.MetodosNumericos.services;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.Biseccion;
+import mx.edu.itses.lfuab.MetodosNumericos.domain.EliminacionGaussiana;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.NewtonRaphson;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.PuntoFijo;
 import mx.edu.itses.lfuab.MetodosNumericos.domain.ReglaFalsa;
@@ -23,7 +24,6 @@ public class UnidadIIServiceImpl implements UnidadIIService {
         XU = biseccion.getXU();
         XRa = 0;
         Ea = 100;
-        // Verificamos que en el intervalo definido haya un cambio de signo
         FXL = Funciones.Ecuacion(biseccion.getFX(), XL);
         FXU = Funciones.Ecuacion(biseccion.getFX(), XU);
         if (FXL * FXU < 0) {
@@ -58,7 +58,6 @@ public class UnidadIIServiceImpl implements UnidadIIService {
             }
         } else {
             Biseccion renglon = new Biseccion();
-            //renglon.setIntervaloInvalido(true);
             respuesta.add(renglon);
         }
 
@@ -94,8 +93,8 @@ public class UnidadIIServiceImpl implements UnidadIIService {
                 renglon.setFXL(FXL);
                 renglon.setFXU(FXU);
                 renglon.setFXR(FXR);
-
                 renglon.setEa(Ea);
+
                 if (FXL * FXR < 0) {
                     XU = XRn;
                 } else if (FXL * FXR > 0) {
@@ -112,7 +111,6 @@ public class UnidadIIServiceImpl implements UnidadIIService {
             }
         } else {
             ReglaFalsa renglon = new ReglaFalsa();
-            //renglon.setIntervaloInvalido(true);
             respuesta.add(regulafalsi);
         }
 
@@ -124,7 +122,6 @@ public class UnidadIIServiceImpl implements UnidadIIService {
         ArrayList<PuntoFijo> respuesta = new ArrayList<>();
         double XI, GXI, Ea;
         XI = fixedpoint.getXI();
-        //     GXI = Funciones.Ecuacion(fixedpoint.getFX(), XI);
         Ea = 100;
         for (int i = 1; i < fixedpoint.getIteracionesMaximas(); i++) {
             GXI = Funciones.Ecuacion(fixedpoint.getFX(), XI);
@@ -187,15 +184,13 @@ public class UnidadIIServiceImpl implements UnidadIIService {
         XI = secant.getXI();
         FXI = Funciones.Ecuacion(secant.getFX(), XI);
         FXMI = Funciones.Ecuacion(secant.getFX(), XMI);
-        // XII = XI - ((FXI * (XMI - XI)) / (FXMI - FXI));
         Ea = 100;
         for (int i = 1; i < secant.getIteracionesMaximas(); i++) {
             FXI = Funciones.Ecuacion(secant.getFX(), XI);
             FXMI = Funciones.Ecuacion(secant.getFX(), XMI);
             XII = XI - ((FXI * (XMI - XI)) / (FXMI - FXI));
-          
-                Ea = Funciones.ErrorRelativo(XII, XI);
-            
+            Ea = Funciones.ErrorRelativo(XII, XI);
+
             Secante renglon = new Secante();
             renglon.setXI(XI);
             renglon.setXMI(XMI);
@@ -223,16 +218,14 @@ public class UnidadIIServiceImpl implements UnidadIIService {
         FXI = Funciones.Ecuacion(modsecant.getFX(), XI);
         FXIS = Funciones.Ecuacion(modsecant.getFX(), (XI + XI * Sigma));
         XII = XI - ((Sigma * XI * FXI) / (FXIS - FXI));
-         System.out.println(XI + (XI * Sigma));
+        System.out.println(XI + (XI * Sigma));
         Ea = 100;
         for (int i = 1; i < modsecant.getIteracionesMaximas(); i++) {
             FXI = Funciones.Ecuacion(modsecant.getFX(), XI);
-           
             FXIS = Funciones.Ecuacion(modsecant.getFX(), (XI + XI * Sigma));
             XII = XI - ((Sigma * XI * FXI) / (FXIS - FXI));
-        
-                Ea = Funciones.ErrorRelativo(XII, XI);
-            
+            Ea = Funciones.ErrorRelativo(XII, XI);
+
             SecanteModificado renglon = new SecanteModificado();
             renglon.setXI(XI);
             renglon.setXII(XII);
@@ -242,11 +235,115 @@ public class UnidadIIServiceImpl implements UnidadIIService {
             renglon.setEa(Ea);
             XI = XII;
             respuesta.add(renglon);
-            if (Ea<= modsecant.getEa()) {
+            if (Ea <= modsecant.getEa()) {
                 break;
             }
         }
-return respuesta;
+        return respuesta;
     }
 
+    @Override
+    public ArrayList<EliminacionGaussiana> AlgoritmoEliminacionGaussiana(EliminacionGaussiana eliminaciongaussiana) {
+        ArrayList<EliminacionGaussiana> respuesta = new ArrayList<>();
+        double A, B, To, De, ER, U, L; // (solo conservados para tu estilo; no se usan como escalares)
+
+        int N = eliminaciongaussiana.getN();
+
+        // Copias locales profundas de A y B (sin helpers externos)
+        double[][] AA = new double[N][N];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                AA[i][j] = eliminaciongaussiana.getA()[i][j];
+            }
+        }
+        double[] BB = new double[N];
+        for (int i = 0; i < N; i++) {
+            BB[i] = eliminaciongaussiana.getB()[i];
+        }
+
+        To = (eliminaciongaussiana.getTo() > 0) ? eliminaciongaussiana.getTo() : 1e-12;
+        De = 1.0;
+
+        // Eliminación hacia adelante (sin pivoteo para mantenerlo compacto)
+        for (int K = 0; K < N - 1; K++) {
+            double PIV = AA[K][K];
+            if (Math.abs(PIV) < To) { De = 0.0; break; }
+
+            for (int I = K + 1; I < N; I++) {
+                double M = AA[I][K] / PIV;
+                AA[I][K] = 0.0;
+                for (int J = K + 1; J < N; J++) {
+                    AA[I][J] -= M * AA[K][J];
+                }
+                BB[I] -= M * BB[K];
+            }
+
+            De *= PIV;
+
+            // renglón (snapshot del paso K)
+            EliminacionGaussiana renglon = new EliminacionGaussiana();
+            double[][] Astep = new double[N][N];
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) Astep[i][j] = AA[i][j];
+            }
+            double[] Bstep = new double[N];
+            for (int i = 0; i < N; i++) Bstep[i] = BB[i];
+
+            renglon.setA(Astep);
+            renglon.setB(Bstep);
+            renglon.setN(N);
+            renglon.setTo(To);
+            renglon.setIteracionesMaximas(eliminaciongaussiana.getIteracionesMaximas());
+            renglon.setPivoteoParcial(eliminaciongaussiana.isPivoteoParcial());
+            renglon.setDe(De);
+            // NO usamos setEr(...) porque en tu POJO arroja UnsupportedOperationException
+            renglon.setX(null);
+            renglon.setU(null);
+            renglon.setL(null);
+            renglon.setPasos(new String[] { "Paso " + K });
+            respuesta.add(renglon);
+        }
+
+        // Sustitución regresiva si el determinante no se anuló
+        double[] XX = null;
+        if (De != 0.0) {
+            double ULT = AA[N - 1][N - 1];
+            if (Math.abs(ULT) < To) {
+                De = 0.0;
+            } else {
+                De *= ULT;
+                XX = new double[N];
+                for (int I = N - 1; I >= 0; I--) {
+                    double S = 0.0;
+                    for (int J = I + 1; J < N; J++) S += AA[I][J] * XX[J];
+                    XX[I] = (BB[I] - S) / AA[I][I];
+                }
+            }
+        }
+
+        // renglón final
+        EliminacionGaussiana resultado = new EliminacionGaussiana();
+        double[][] Afinal = new double[N][N];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) Afinal[i][j] = AA[i][j];
+        }
+        double[] Bfinal = new double[N];
+        for (int i = 0; i < N; i++) Bfinal[i] = BB[i];
+
+        resultado.setA(Afinal);
+        resultado.setB(Bfinal);
+        resultado.setN(N);
+        resultado.setTo(To);
+        resultado.setIteracionesMaximas(eliminaciongaussiana.getIteracionesMaximas());
+        resultado.setPivoteoParcial(eliminaciongaussiana.isPivoteoParcial());
+        resultado.setX(XX);
+        resultado.setDe(De);
+        // NO llamamos setEr(...)
+        resultado.setU(null);
+        resultado.setL(null);
+        resultado.setPasos(new String[] { "Fin" });
+        respuesta.add(resultado);
+
+        return respuesta;
+    }
 }

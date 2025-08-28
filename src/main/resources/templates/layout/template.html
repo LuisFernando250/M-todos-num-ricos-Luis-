@@ -17,7 +17,7 @@
                         <a class="nav-link active" aria-current="page" href="/">Inicio</a>
                         <a class="nav-link" href="/unit2">Solución Ecuaciones</a>
                         <a class="nav-link" href="/unit3">Sistemas Lineales</a>
-                        <a class="nav-link disabled" href="/unit4">Ajuste de Curvas</a>
+                        <a class="nav-link" href="/unit4">Ajuste de Curvas</a>
                         <a class="nav-link disabled" href="/unit5">Diferenciación e Integración</a>
                         <a class="nav-link disabled" href="/unit6">Ecuaciones Diferenciales</a>
                     </ul>
@@ -27,11 +27,16 @@
 
             </nav>
 
-              <div class="container" th:fragment="bannerunit2">
-            <div class="row">
-                <img class="img-fluid w-100" th:src="@{/images/metodosnumericos.png}"/>
+            <div class="container" th:fragment="bannerunit2">
+                <div class="row">
+                    <img class="img-fluid w-100" th:src="@{/images/metodosnumericos.png}"/>
+                </div>
             </div>
-        </div>
-            
+            <div class="container" th:fragment="bannerunit3">
+                <div class="row">
+                    <img class="img-fluid w-100" th:src="@{/images/metodosnumericos.png}"/>
+                </div>
+            </div>
+
         </body>
     </html>

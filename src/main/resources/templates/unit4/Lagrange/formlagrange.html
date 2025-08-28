@@ -1,0 +1,97 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MÉTODOS NUMÉRICOS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</head>
+
+<script th:inline="javascript">
+function crearPuntos() {
+    var n = parseInt(document.getElementById('N').value || '0', 10);
+    var cont = document.getElementById('ContenedorPuntos');
+    cont.replaceChildren();
+    if (isNaN(n) || n <= 0) return;
+
+    for (var i = 0; i < n; i++) {
+        var row = document.createElement('div');
+        row.className = 'row g-2 mb-2';
+
+        var c1 = document.createElement('div');
+        c1.className = 'col';
+        var x = document.createElement('input');
+        x.type = 'text';
+        x.name = 'x[]';
+        x.placeholder = 'x' + (i + 1);
+        x.className = 'form-control';
+        c1.appendChild(x);
+
+        var c2 = document.createElement('div');
+        c2.className = 'col';
+        var y = document.createElement('input');
+        y.type = 'text';
+        y.name = 'y[]';
+        y.placeholder = 'y' + (i + 1);
+        y.className = 'form-control';
+        c2.appendChild(y);
+
+        row.appendChild(c1);
+        row.appendChild(c2);
+        cont.appendChild(row);
+    }
+
+    document.getElementById('resolver').style.display = 'block';
+}
+</script>
+
+<body>
+    <nav th:replace="/layout/template :: menu"></nav>
+    <div th:replace="/layout/template :: bannerunit3"></div>
+
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mt-2">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/unit4">Ajuste de Curvas</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Formulario - Lagrange</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container">
+        <form class="row g-3" th:action="@{/unit4/solveLagrange}" method="post" th:object="${lagrange}">
+            <div class="container">
+                <h1 class="text">Polinomio de interpolación de Lagrange</h1>
+              <h3 class="text">Ingresa los datos:</h3>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="N" class="form-label"># de puntos (n)</label>
+                        <input type="text" class="form-control" id="N" name="n" placeholder="3">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="PX" class="form-label">x a evaluar (opcional)</label>
+                        <input type="text" class="form-control" id="PX" name="px" placeholder="ej. 2.5">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="button" class="btn btn-secondary" onclick="crearPuntos()">Crear puntos</button>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <p class="mb-1 fw-semibold">Puntos (x, y)</p>
+                    <div id="ContenedorPuntos"></div>
+                </div>
+
+                <div id="resolver" class="row mt-3" style="display:none">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary mt-3">Construir polinomio</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
